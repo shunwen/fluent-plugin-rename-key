@@ -49,7 +49,7 @@ To successfully save it into MongoDB, we can use the following config to replace
 </match>
 ```
 
-The resulting record will be `'x$url' => 'www.google.com', 'eve2' => {'x$1' => 'option1'}`
+The resulting record will be `'x$url' => 'www.google.com', 'eve_2' => {'x$1' => 'option1'}`
 
 ### MatchData placeholder
 
