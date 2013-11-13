@@ -14,7 +14,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
       key_regexp, new_key = parse_rename_rule conf[r]
 
       if key_regexp.nil? || new_key.nil?
-        raise Fluent::ConfigError, "Failed to parse[#{key_regexp},#{new_key}]: #{r} #{conf[r]}"
+        raise Fluent::ConfigError, "Failed to parse: #{r} #{conf[r]}"
       end
 
       if @rename_rules.map { |r| r[:key_regexp] }.include? /#{key_regexp}/
