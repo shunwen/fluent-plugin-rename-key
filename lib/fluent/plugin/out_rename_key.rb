@@ -17,11 +17,11 @@ class Fluent::RenameKeyOutput < Fluent::Output
         raise Fluent::ConfigError, "Failed to parse[#{key_regexp},#{new_key}]: #{r} #{conf[r]}"
       end
 
-      if @rename_rules.map { |e| e.first }.include? /#{key_regexp}/
+      if @rename_rules.map { |r| r[:key_regexp] }.include? /#{key_regexp}/
         raise Fluent::ConfigError, "Duplicated rules for key #{key_regexp}: #{@rename_rules}"
       end
 
-      @rename_rules << [/#{key_regexp}/, new_key]
+      @rename_rules << { key_regexp: /#{key_regexp}/, new_key: new_key }
       $log.info "Added rename key rule: #{r} #{@rename_rules.last}"
     end
 
@@ -55,9 +55,9 @@ class Fluent::RenameKeyOutput < Fluent::Output
     record.each do |key, value|
 
       @rename_rules.each do |rule|
-        match_data = key.match rule[0]
+        match_data = key.match rule[:key_regexp]
         next unless match_data
-        key = 'x$url'
+        key = rule[:new_key]
         break
       end
 
