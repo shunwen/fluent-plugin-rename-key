@@ -9,3 +9,4 @@ tmtags
 \#*
 .\#*
 *.swp
+tmp/*
