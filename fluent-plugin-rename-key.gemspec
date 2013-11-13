@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.authors     = ["Shunwen Hsiao"]
   gem.email       = "hsiaoshunwen@gmail.com"
   gem.homepage    = "https://github.com/shunwen/fluent-plugin-rename-key"
-  gem.summary     = %q{Fluentd Output filter plugin. It has designed to rename keys which match given patterns and assign new tags, and re-emit a record with the new tag.}
+  gem.summary     = %q[Fluentd Output filter plugin. It is designed to rename keys which match given patterns and assign new tags, and re-emit a record with the new tag.]
   gem.has_rdoc    = false
 
   gem.files       = `git ls-files`.split("\n")
