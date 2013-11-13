@@ -44,7 +44,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
   # private
 
   def parse_rename_rule rule
-    if rule.match /^([^\s]+)\s+([^\s]+)$/
+    if rule.match /^([^\s]+)\s+(.+)$/
       return $~.captures
     end
   end
@@ -56,8 +56,11 @@ class Fluent::RenameKeyOutput < Fluent::Output
 
       @rename_rules.each do |rule|
         match_data = key.match rule[:key_regexp]
+        value = rename_key value if value.is_a? Hash and @deep_rename
+
         next unless match_data
-        key = rule[:new_key]
+        placeholder = get_placeholder match_data
+        key = rule[:new_key].gsub /\${\w+\[\d+\]?}/, placeholder
         break
       end
 
@@ -67,14 +70,14 @@ class Fluent::RenameKeyOutput < Fluent::Output
     new_record
   end
 
-  def filter_key_starts_with_dollar_sign original_params
-    filtered_params = {}
-    original_params.each do |key, value|
-      key = 'x$' + key[1..-1] if key.start_with? '$'
-      value = filter_key_starts_with_dollar_sign value if value.is_a? Hash
-      filtered_params[key] = value
+  def get_placeholder match_data
+    placeholder = {}
+
+    match_data.to_a.each_with_index do |e, idx|
+      placeholder.store "${md[#{idx}]}", e
     end
 
-    filtered_params
+    placeholder
   end
+
 end

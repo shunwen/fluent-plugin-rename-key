@@ -7,22 +7,22 @@ describe Fluent::RenameKeyOutput do
   end
 
   CONFIG = %q[
-    rename_rule1 ^\$(.+) ${captures[1]}
-    rename_rule2 ^[.]+([^.]+)[.\s]*([^.]+) ${captures[1]}\ssomthing\s${captures[2]}
+    rename_rule1 ^\$(.+) ${md[1]}
+    rename_rule2 ^[.]+([^.]+)[.\s]*([^.]+) ${md[1]} somthing ${md[2]}
   ]
 
   CONFIG_MULTI_RULES_FOR_A_KEY = %q[
-    rename_rule1 ^\$(.+) ${captures[1]}
-    rename_rule2 ^\$(.+) ${captures[1]}\ssomthing
+    rename_rule1 ^\$(.+) ${md[1]}
+    rename_rule2 ^\$(.+) ${md[1]} somthing
   ]
 
   CONFIG_REMOVE_TAG_PREFIX = %q[
-    rename_rule1 ^\$(.+) ${captures[1]}\ssomthing
+    rename_rule1 ^\$(.+) ${md[1]} somthing
     remove_tag_prefix input
   ]
 
   CONFIG_APPEND_TAG = %q[
-    rename_rule1 ^\$(.+) ${captures[1]}\ssomthing
+    rename_rule1 ^\$(.+) ${md[1]} somthing
     append_tag postfix
   ]
 
@@ -45,8 +45,8 @@ describe Fluent::RenameKeyOutput do
 
     it "configures multiple rules" do
       d = create_driver
-      expect(d.instance.config['rename_rule1']).to eq '^\$(.+) ${captures[1]}'
-      expect(d.instance.config['rename_rule2']).to eq '^[.]+([^.]+)[.\s]*([^.]+) ${captures[1]}\ssomthing\s${captures[2]}'
+      expect(d.instance.config['rename_rule1']).to eq '^\$(.+) ${md[1]}'
+      expect(d.instance.config['rename_rule2']).to eq '^[.]+([^.]+)[.\s]*([^.]+) ${md[1]}\ssomthing\s${md[2]}'
     end
   end
 
@@ -66,7 +66,7 @@ describe Fluent::RenameKeyOutput do
 
   context "private methods" do
     describe "#parse_rename_rule" do
-      let(:rename_rule_example) { '^\$(.+) #{captures[1]}' }
+      let(:rename_rule_example) { '^\$(.+) ${md[1]}' }
       let(:result) { Fluent::RenameKeyOutput.new.parse_rename_rule rename_rule_example }
 
       it "captures 2 items, the key_regexp and new_name" do
@@ -75,14 +75,37 @@ describe Fluent::RenameKeyOutput do
     end
 
     describe "#rename_key" do
-      it "replace key name which matches the key_regexp at the first level" do
-        d = create_driver 'rename_rule1 ^\$(.+) x$${captures[1]}'
+      it "replace key name which matches the key_regexp at all level" do
+        d = create_driver %q[
+          rename_rule1 ^\$(.+) x$${md[1]}
+        ]
         d.run do
-          d.emit '$url' => 'www.google.com', 'level2' => {'$1' => 'options1'}
+          d.emit '$url' => 'www.google.com', 'level2' => {'$1' => 'option1'}
         end
-        emits = d.emits
-        expect(emits).to have(1).items
-        expect(emits[0][2]).to have_key 'x$url'
+        result = d.emits[0][2]
+        expect(result).to have_key 'x$url'
+        expect(result['level2']).to have_key 'x$1'
+      end
+
+      it "replace key name only at the first level when deep_rename is false" do
+        d = create_driver %q[
+          rename_rule1 ^\$(.+) x$${md[1]}
+          deep_rename false
+        ]
+        d.run do
+          d.emit '$url' => 'www.google.com', 'level2' => {'$1' => 'option1'}
+        end
+        result = d.emits[0][2]
+        expect(result).to have_key 'x$url'
+        expect(result['level2']).to have_key '$1'
+      end
+
+      it "replace key name using match data" do
+        d = create_driver 'rename_rule1 ^\$(.+)\s(\w+) x$${md[2]} ${md[1]}'
+        d.run do
+          d.emit '$url jump' => 'www.google.com', 'level2' => {'$1' => 'options1'}
+        end
+        expect(d.emits[0][2]).to have_key 'x$jump url'
       end
     end
   end
