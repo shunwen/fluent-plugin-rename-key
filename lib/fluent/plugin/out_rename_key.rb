@@ -56,14 +56,14 @@ class Fluent::RenameKeyOutput < Fluent::Output
 
       @rename_rules.each do |rule|
         match_data = key.match rule[:key_regexp]
-        value = rename_key value if value.is_a? Hash and @deep_rename
+        next unless match_data # next rule
 
-        next unless match_data
         placeholder = get_placeholder match_data
         key = rule[:new_key].gsub /\${\w+\[\d+\]?}/, placeholder
         break
       end
 
+      value = rename_key value if value.is_a? Hash and @deep_rename
       new_record[key] = value
     end
 

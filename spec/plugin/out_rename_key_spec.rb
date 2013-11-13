@@ -46,7 +46,7 @@ describe Fluent::RenameKeyOutput do
     it "configures multiple rules" do
       d = create_driver
       expect(d.instance.config['rename_rule1']).to eq '^\$(.+) ${md[1]}'
-      expect(d.instance.config['rename_rule2']).to eq '^[.]+([^.]+)[.\s]*([^.]+) ${md[1]}\ssomthing\s${md[2]}'
+      expect(d.instance.config['rename_rule2']).to eq '^[.]+([^.]+)[.\s]*([^.]+) ${md[1]} somthing ${md[2]}'
     end
   end
 
