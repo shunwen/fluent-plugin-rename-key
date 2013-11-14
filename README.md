@@ -1,5 +1,7 @@
 # fluent-plugin-rename-key
 
+[![Build Status](https://travis-ci.org/shunwen/fluent-plugin-rename-key.png?branch=master)](https://travis-ci.org/shunwen/fluent-plugin-rename-key)
+
 ## Overview
 
 Fluentd Output filter plugin. It goes through each record, rename keys matching the given regular expressions, and re-emit the event with a new tag. This plugin resembles the implementation of [fluent-plugin-rewrite-tag-filter](https://github.com/y-ken/fluent-plugin-rewrite-tag-filter).
@@ -42,8 +44,8 @@ Take this record as example: `'$url' => 'www.google.com', 'level2' => {'$1' => '
 To successfully save it into MongoDB, we can use the following config to replace the keys starting with dollar sign.
 
 ```
-# At rename_rule1, it matches the key starting the `$`, say `$url`, 
-# and puts the following characters into match group 1. 
+# At rename_rule1, it matches the key starting the `$`, say `$url`,
+# and puts the following characters into match group 1.
 # Then uses the content in match group 1, `url`, to generate the new key name `x$url`.
 
 <match input.test>

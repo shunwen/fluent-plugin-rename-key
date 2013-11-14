@@ -3,7 +3,7 @@ $:.push File.expand_path('../lib', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.name        = "fluent-plugin-rename-key"
-  gem.version     = "0.1.2"
+  gem.version     = "0.1.3"
   gem.license     = "Apache 2.0"
   gem.authors     = ["Shunwen Hsiao"]
   gem.email       = "hsiaoshunwen@gmail.com"
@@ -19,5 +19,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency "fluentd", "~> 0.10.9"
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "bundler"
+  gem.add_development_dependency "rake"
 
 end
