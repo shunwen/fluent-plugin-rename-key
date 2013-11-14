@@ -6,7 +6,7 @@
 
 Fluentd Output filter plugin. It goes through each record, rename keys matching the given regular expressions, and re-emit the event with a new tag. This plugin resembles the implementation of [fluent-plugin-rewrite-tag-filter](https://github.com/y-ken/fluent-plugin-rewrite-tag-filter).
 
-This plugin is created to resolve the invalid record problem while converting to BSON document before inserting to MongoDB, see [restrictions on Field Names](http://docs.mongodb.org/manual/reference/limits/#Restrictions on Field Names) and [MongoDB Document Types](http://docs.mongodb.org/meta-driver/latest/legacy/bson/#mongodb-document-types).
+This plugin is created to resolve the invalid record problem while converting to BSON document before inserting to MongoDB, see [Restrictions on Field Names](http://docs.mongodb.org/manual/reference/limits/#Restrictions on Field Names) and [MongoDB Document Types](http://docs.mongodb.org/meta-driver/latest/legacy/bson/#mongodb-document-types).
 
 ## Installation
 
