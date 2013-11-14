@@ -30,6 +30,10 @@ remove_tag_prefix <string>
 
 # Optional: append additional name to the original tag, default **key_renamed**
 append_tag <string>
+
+# Optional: dig into the hash structures and rename every matched key or rename only keys at the first level
+# default is true
+deep_rename <bool>
 ```
 
 ### Example
@@ -38,7 +42,9 @@ Take this record as example: `'$url' => 'www.google.com', 'level2' => {'$1' => '
 To successfully save it into MongoDB, we can use the following config to replace the keys starting with dollar sign.
 
 ```
-# At rename_rule1, it matches the key starting the `$`, say `$url`, and puts the following characters into match group 1. and uses the content in match group 1, `url`, to generate the new key name `x$url`.
+# At rename_rule1, it matches the key starting the `$`, say `$url`, 
+# and puts the following characters into match group 1. 
+# Then uses the content in match group 1, `url`, to generate the new key name `x$url`.
 
 <match input.test>
   type rename_key
