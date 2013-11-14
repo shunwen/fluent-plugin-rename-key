@@ -16,6 +16,9 @@ install with gem or fluent-gem command as:
 # for fluentd
 $ gem install fluent-plugin-rename-key
 
+# for td-agent OSX (Homebrew)
+$ /usr/local/Cellar/td-agent/1.1.17/bin/fluent-gem install fluent-plugin-rename-key
+
 # for td-agent
 $ sudo /usr/lib64/fluent/ruby/bin/fluent-gem install fluent-plugin-rename-key
 ```
