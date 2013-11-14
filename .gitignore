@@ -10,3 +10,4 @@ tmtags
 .\#*
 *.swp
 tmp/*
+coverage/*

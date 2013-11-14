@@ -1,7 +1,16 @@
 # fluent-plugin-rename-key
 
-[![Build Status](https://travis-ci.org/shunwen/fluent-plugin-rename-key.png?branch=master)](https://travis-ci.org/shunwen/fluent-plugin-rename-key)
+## Status
+- RubyGems: [![Gem Version][rubygems-img]][rubygems-url]
+- TravisCI: [![Build Status][travis-img]][travis-url]
+- Coveralls: [![Coverage Status][coveralls-img]][coveralls-url]
 
+[rubygems-img]: https://badge.fury.io/rb/fluent-plugin-rename-key.png
+[rubygems-url]: http://badge.fury.io/rb/fluent-plugin-rename-key
+[travis-img]: https://travis-ci.org/shunwen/fluent-plugin-rename-key.png
+[travis-url]: https://travis-ci.org/shunwen/fluent-plugin-rename-key
+[coveralls-img]: https://coveralls.io/repos/shunwen/fluent-plugin-rename-key/badge.png
+[coveralls-url]: https://coveralls.io/r/shunwen/fluent-plugin-rename-key
 ## Overview
 
 Fluentd Output filter plugin. It goes through each record, rename keys matching the given regular expressions, and re-emit the event with a new tag. This plugin resembles the implementation of [fluent-plugin-rewrite-tag-filter](https://github.com/y-ken/fluent-plugin-rewrite-tag-filter).
