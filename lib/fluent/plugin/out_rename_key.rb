@@ -1,5 +1,5 @@
 class Fluent::RenameKeyOutput < Fluent::Output
-  Fluent::Plugin.register_output 'rename-key', self
+  Fluent::Plugin.register_output 'rename_key', self
 
   config_param :remove_tag_prefix, :string, default: nil
   config_param :append_tag, :string, default: 'key_renamed'
