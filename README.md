@@ -31,6 +31,9 @@ $ sudo /usr/lib64/fluent/ruby/bin/fluent-gem install fluent-plugin-rename-key
 ### Syntax
 
 ```
+# <num> is a integer, used to sort and apply the rules
+# <key_regexp> is the regular expression used to match the keys, whitespace is not allowed, use "\s" instead
+# <new_key> is the string with MatchData placeholder for creating the new key name, whitespace is allowed
 rename_rule<num> <key_regexp> <new_key>
 
 # Optional: remove tag prefix
@@ -59,17 +62,17 @@ To successfully save it into MongoDB, we can use the following config to replace
   remove_tag_prefix input.test
   append_tag renamed
   rename_rule1 ^\$(.+) x$${md[1]}
-  rename_rule2 ^l(eve)l(\d+) ${md[1]}_${md[2]}
+  rename_rule2 ^l(.{3})l(\d+) ${md[1]}_${md[2]}
 </match>
 ```
 
-The resulting record will be `'x$url' => 'www.google.com', 'eve_2' => {'x$1' => 'option1'}`
+The resulting record becomes `'x$url' => 'www.google.com', 'eve_2' => {'x$1' => 'option1'}`
 
 ### MatchData placeholder
 
 This plugin uses Ruby's `String#match` to match the key to be replaced, and it is possible to refer to the contents of the resulting `MatchData` to create the new key name. `${md[0]}` refers to the matched string and `${md[1]}` refers to match group 1, and so on.
 
-**Note** Range expression ```${md[0..2]}``` is not supported.
+**Note:** Range expression ```${md[0..2]}``` is not supported.
 
 ## TODO
 
