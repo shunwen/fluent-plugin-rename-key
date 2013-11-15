@@ -63,7 +63,14 @@ class Fluent::RenameKeyOutput < Fluent::Output
         break
       end
 
-      value = rename_key value if value.is_a? Hash and @deep_rename
+      if @deep_rename
+        if value.is_a? Hash
+          value = rename_key value
+        elsif value.is_a? Array
+          value = value.map { |v| v.is_a?(Hash) ? rename_key(v) : v }
+        end
+      end
+
       new_record[key] = value
     end
 
