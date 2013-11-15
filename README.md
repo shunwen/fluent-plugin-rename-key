@@ -7,13 +7,13 @@
 
 ## Overview
 
-Fluentd Output filter plugin. It goes through each record, rename keys matching the given regular expressions, and re-emit the event with a new tag. This plugin resembles the implementation of [fluent-plugin-rewrite-tag-filter](https://github.com/y-ken/fluent-plugin-rewrite-tag-filter).
+Fluentd Output filter plugin. It goes through each record, renames keys matching the given regular expressions, and re-emits the event with a new tag. This plugin resembles the implementation of [fluent-plugin-rewrite-tag-filter](https://github.com/y-ken/fluent-plugin-rewrite-tag-filter).
 
-This plugin is created to resolve the invalid record problem while converting to BSON document before inserting to MongoDB, see [Restrictions on Field Names](http://docs.mongodb.org/manual/reference/limits/#Restrictions on Field Names) and [MongoDB Document Types](http://docs.mongodb.org/meta-driver/latest/legacy/bson/#mongodb-document-types).
+This plugin is created to resolve the invalid record problem while converting to BSON document before inserting to MongoDB, see [Restrictions on Field Names](http://docs.mongodb.org/manual/reference/limits/#Restrictions on Field Names) and [MongoDB Document Types](http://docs.mongodb.org/meta-driver/latest/legacy/bson/#mongodb-document-types) for more information.
 
 ## Installation
 
-install with gem or fluent-gem command as:
+Install with gem or fluent-gem command as:
 
 ```
 # for fluentd
@@ -39,11 +39,11 @@ rename_rule<num> <key_regexp> <new_key>
 # Optional: remove tag prefix
 remove_tag_prefix <string>
 
-# Optional: append additional name to the original tag, default **key_renamed**
+# Optional: append additional name to the original tag, default is "key_renamed"
 append_tag <string>
 
-# Optional: dig into the hash structures and rename every matched key or rename only keys at the first level
-# default is true
+# Optional: dig into the hash structures and rename every matched key or rename only keys at the first level,
+# default is "true"
 deep_rename <bool>
 ```
 
@@ -53,9 +53,9 @@ Take this record as example: `'$url' => 'www.google.com', 'level2' => {'$1' => '
 To successfully save it into MongoDB, we can use the following config to replace the keys starting with dollar sign.
 
 ```
-# At rename_rule1, it matches the key starting the `$`, say `$url`,
+# At rename_rule1, it matches the key starting the '$', say '$url',
 # and puts the following characters into match group 1.
-# Then uses the content in match group 1, `url`, to generate the new key name `x$url`.
+# Then uses the content in match group 1, ${md[1]} = 'url', to generate the new key name 'x$url'.
 
 <match input.test>
   type rename_key
@@ -66,13 +66,13 @@ To successfully save it into MongoDB, we can use the following config to replace
 </match>
 ```
 
-The resulting record becomes `'x$url' => 'www.google.com', 'eve_2' => {'x$1' => 'option1'}`
+The resulting record becomes `'x$url' => 'www.google.com', 'eve_2' => {'x$1' => 'option1'}` with new tag `renamed`.
 
 ### MatchData placeholder
 
 This plugin uses Ruby's `String#match` to match the key to be replaced, and it is possible to refer to the contents of the resulting `MatchData` to create the new key name. `${md[0]}` refers to the matched string and `${md[1]}` refers to match group 1, and so on.
 
-**Note:** Range expression ```${md[0..2]}``` is not supported.
+**Note:** Range expression `${md[0..2]}` is not supported.
 
 ## TODO
 
