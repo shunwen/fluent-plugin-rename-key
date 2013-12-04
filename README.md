@@ -82,3 +82,7 @@ Pull requests are very welcome!!
 
 Copyright :  Copyright (c) 2013- Shunwen Hsiao (@hswtw)
 License   :  Apache License, Version 2.0
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/shunwen/fluent-plugin-rename-key/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
