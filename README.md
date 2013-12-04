@@ -4,6 +4,7 @@
 [![Gem Version](https://badge.fury.io/rb/fluent-plugin-rename-key.png)](http://badge.fury.io/rb/fluent-plugin-rename-key)
 [![Build Status](https://travis-ci.org/shunwen/fluent-plugin-rename-key.png?branch=master)](https://travis-ci.org/shunwen/fluent-plugin-rename-key)
 [![Coverage Status](https://coveralls.io/repos/shunwen/fluent-plugin-rename-key/badge.png?branch=master)](https://coveralls.io/r/shunwen/fluent-plugin-rename-key?branch=master)
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/shunwen/fluent-plugin-rename-key/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 ## Overview
 
@@ -82,7 +83,4 @@ Pull requests are very welcome!!
 
 Copyright :  Copyright (c) 2013- Shunwen Hsiao (@hswtw)
 License   :  Apache License, Version 2.0
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/shunwen/fluent-plugin-rename-key/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
