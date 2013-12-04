@@ -80,11 +80,12 @@ describe Fluent::RenameKeyOutput do
           rename_rule1 ^\$(.+) x$${md[1]}
         ]
         d.run do
-          d.emit '$url' => 'www.google.com', 'level2' => {'$1' => 'option1'}
+          d.emit '$url' => 'www.google.com', 'level2' => {'id'=>'something', 'a'=>{'$1' => 'option1'}}
         end
         result = d.emits[0][2]
+        p result
         expect(result).to have_key 'x$url'
-        expect(result['level2']).to have_key 'x$1'
+        expect(result['level2']['a']).to have_key 'x$1'
       end
 
       it "replace key name only at the first level when deep_rename is false" do
@@ -93,11 +94,11 @@ describe Fluent::RenameKeyOutput do
           deep_rename false
         ]
         d.run do
-          d.emit '$url' => 'www.google.com', 'level2' => {'$1' => 'option1'}
+          d.emit '$url' => 'www.google.com', 'level2' => {'id'=>'something', 'a'=>{'$1' => 'option1'}}
         end
         result = d.emits[0][2]
         expect(result).to have_key 'x$url'
-        expect(result['level2']).to have_key '$1'
+        expect(result['level2']['a']).to have_key '$1'
       end
 
       it "replace key of hashes in an array" do
