@@ -1,4 +1,4 @@
-# fluent-plugin-rename-key
+# fluent-plugin-rename-key, a plugin for [Fluentd](http://fluentd.org)
 
 ## Status
 [![Gem Version](https://badge.fury.io/rb/fluent-plugin-rename-key.png)](http://badge.fury.io/rb/fluent-plugin-rename-key)
