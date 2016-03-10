@@ -25,7 +25,28 @@ class Fluent::RenameKeyOutput < Fluent::Output
       $log.info "Added rename key rule: #{r} #{@rename_rules.last}"
     end
 
-    raise Fluent::ConfigError, "No rename rules are given" if @rename_rules.empty?
+    @replace_rules = []
+    conf_replace_rules = conf.keys.select { |k| k =~ /^replace_rule(\d+)$/ }
+    conf_replace_rules.sort_by { |r| r.sub('replace_rule', '').to_i }.each do |r|
+      key_regexp, replacement = parse_replace_rule conf[r]
+
+      if key_regexp.nil?
+        raise Fluent::ConfigError, "Failed to parse: #{r} #{conf[r]}"
+      end
+
+      if replacement.nil?
+          replacement = ""
+      end
+
+      if @replace_rules.map { |r| r[:key_regexp] }.include? /#{key_regexp}/
+        raise Fluent::ConfigError, "Duplicated rules for key #{key_regexp}: #{@replace_rules}"
+      end
+
+      @replace_rules << { key_regexp: /#{key_regexp}/, replacement: replacement }
+      $log.info "Added replace key rule: #{r} #{@replace_rules.last}"
+    end
+
+    raise Fluent::ConfigError, "No rename or replace rules are given" if @rename_rules.empty? && @replace_rules.empty?
 
     @remove_tag_prefix = /^#{Regexp.escape @remove_tag_prefix}\.?/ if @remove_tag_prefix
   end
@@ -35,6 +56,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
       new_tag = @remove_tag_prefix ? tag.sub(@remove_tag_prefix, '') : tag
       new_tag = "#{new_tag}.#{@append_tag}".sub(/^\./, '')
       new_record = rename_key record
+      new_record = replace_key new_record
       Fluent::Engine.emit new_tag, time, new_record
     end
 
@@ -45,6 +67,12 @@ class Fluent::RenameKeyOutput < Fluent::Output
 
   def parse_rename_rule rule
     if rule.match /^([^\s]+)\s+(.+)$/
+      return $~.captures
+    end
+  end
+
+  def parse_replace_rule rule
+    if rule.match /^([^\s]+)(?:\s+(.+))?$/
       return $~.captures
     end
   end
@@ -68,6 +96,34 @@ class Fluent::RenameKeyOutput < Fluent::Output
           value = rename_key value
         elsif value.is_a? Array
           value = value.map { |v| v.is_a?(Hash) ? rename_key(v) : v }
+        end
+      end
+
+      new_record[key] = value
+    end
+
+    new_record
+  end
+
+  def replace_key record
+    new_record = {}
+
+    record.each do |key, value|
+
+      @replace_rules.each do |rule|
+        match_data = key.match rule[:key_regexp]
+        next unless match_data # next rule
+
+        placeholder = get_placeholder match_data
+        key = key.gsub rule[:key_regexp], rule[:replacement].gsub(/\${\w+\[\d+\]?}/, placeholder)
+        break
+      end
+
+      if @deep_rename
+        if value.is_a? Hash
+          value = replace_key value
+        elsif value.is_a? Array
+          value = value.map { |v| v.is_a?(Hash) ? replace_key(v) : v }
         end
       end
 
