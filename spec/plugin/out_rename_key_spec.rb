@@ -70,7 +70,7 @@ describe Fluent::RenameKeyOutput do
       let(:result) { Fluent::RenameKeyOutput.new.parse_rename_rule rename_rule_example }
 
       it "captures 2 items, the key_regexp and new_name" do
-        expect(result).to have(2).items
+        expect(result.size).to eq 2
       end
     end
 
