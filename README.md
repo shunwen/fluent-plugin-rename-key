@@ -37,6 +37,11 @@ $ sudo /usr/lib64/fluent/ruby/bin/fluent-gem install fluent-plugin-rename-key
 # <new_key> is the string with MatchData placeholder for creating the new key name, whitespace is allowed
 rename_rule<num> <key_regexp> <new_key>
 
+# <num> is an integer, used to sort and apply the rules
+# <key_regexp> is the regular expression used to match the keys, whitespace is not allowed, use "\s" instead
+# <new_key> is the string to replace the matches with, with MatchData placeholder for creating the new key name, whitespace is allowed. Optional, if missing then the matches are removed
+replace_rule<num> <key_regexp> <new_key>
+
 # Optional: remove tag prefix
 remove_tag_prefix <string>
 
