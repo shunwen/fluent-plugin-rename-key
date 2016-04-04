@@ -11,10 +11,6 @@ describe Fluent::RenameKeyOutput do
     rename_rule2 ^l(eve)l(\d+) ${md[1]}_${md[2]}
   ]
 
-  CONFIG_MULTI_RULES_FOR_A_KEY = %q[
-    rename_rule1 ^\$(.+) ${md[1]}
-    rename_rule2 ^\$(.+) ${md[1]} somthing
-  ]
 
   CONFIG_REMOVE_TAG_PREFIX = %q[
     rename_rule1 ^\$(.+) ${md[1]} somthing
@@ -28,26 +24,6 @@ describe Fluent::RenameKeyOutput do
 
   def create_driver conf=CONFIG, tag='test'
     Fluent::Test::OutputTestDriver.new(Fluent::RenameKeyOutput, tag).configure(conf)
-  end
-
-  context "configurations" do
-    it "raises error when no configuration" do
-      expect{create_driver ''}.to raise_error Fluent::ConfigError
-    end
-
-    it "raises error when rule is incomplete" do
-      expect{create_driver 'rename_rule1 ^$(.+?) '}.to raise_error Fluent::ConfigError
-    end
-
-    it "raises error when multiple rules are set for the same key pattern" do
-      expect{create_driver CONFIG_MULTI_RULES_FOR_A_KEY}.to raise_error Fluent::ConfigError
-    end
-
-    it "configures multiple rules" do
-      d = create_driver
-      expect(d.instance.config['rename_rule1']).to eq '^\$(.+) x$${md[1]}'
-      expect(d.instance.config['rename_rule2']).to eq '^l(eve)l(\d+) ${md[1]}_${md[2]}'
-    end
   end
 
   context "emits" do
