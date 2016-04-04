@@ -89,15 +89,11 @@ class Fluent::RenameKeyOutput < Fluent::Output
   # private
 
   def parse_rename_rule rule
-    if rule.match /^([^\s]+)\s+(.+)$/
-      $~.captures
-    end
+    $~.captures if rule.match /^([^\s]+)\s+(.+)$/
   end
 
   def parse_replace_rule rule
-    if rule.match /^([^\s]+)(?:\s+(.+))?$/
-      $~.captures
-    end
+    $~.captures if rule.match /^([^\s]+)(?:\s+(.+))?$/
   end
 
   def rename_key record
@@ -110,7 +106,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
         next unless match_data # next rule
 
         placeholder = get_placeholder match_data
-        key = rule[:new_key].gsub /\${\w+\[\d+\]?}/, placeholder
+        key = rule[:new_key].gsub /\${md\[\d+\]}/, placeholder
         break
       end
 
@@ -138,7 +134,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
         next unless match_data # next rule
 
         placeholder = get_placeholder match_data
-        key = key.gsub rule[:key_regexp], rule[:replacement].gsub(/\${\w+\[\d+\]?}/, placeholder)
+        key = key.gsub rule[:key_regexp], rule[:replacement].gsub(/\${md\[\d+\]}/, placeholder)
         break
       end
 
@@ -160,7 +156,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
     placeholder = {}
 
     match_data.to_a.each_with_index do |e, idx|
-      placeholder.store "${md[#{idx}]}", e
+      placeholder["${md[#{idx}]}"] = e
     end
 
     placeholder
