@@ -73,13 +73,13 @@ class Fluent::RenameKeyOutput < Fluent::Output
 
   def parse_rename_rule rule
     if rule.match /^([^\s]+)\s+(.+)$/
-  def parse_replace_rule rule
-      return $~.captures
+      $~.captures
     end
   end
 
+  def parse_replace_rule rule
     if rule.match /^([^\s]+)(?:\s+(.+))?$/
-      return $~.captures
+      $~.captures
     end
   end
 
