@@ -24,19 +24,7 @@ describe Fluent::RenameKeyOutput do
         expect(result).to have(2).items
       end
     end
-
-    describe "#rename_key" do
-
-      it "replaces key using multiple rules" do
-        d = create_driver
-        d.run do
-          d.emit '$url jump' => 'www.google.com', 'level2' => {'$1' => 'options1'}
-        end
-        result = d.emits[0][2]
-        expect(result).to have_key 'eve_2'
-        expect(result['eve_2']).to have_key 'x$1'
-      end
-    end
+    
   end
 
 end

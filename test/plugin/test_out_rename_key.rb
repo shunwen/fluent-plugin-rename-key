@@ -32,13 +32,13 @@ class RenameKeyOutputTest < Test::Unit::TestCase
 
   def test_config_success
     config_multiple_rules = %q[
-      rename_rule1 ^\$(.+) x$${md[1]}
-      rename_rule2 ^(level)(\d+) ${md[1]}_${md[2]}
+      rename_rule1 ^\$(.+)1 x$${md[1]}
+      rename_rule2 ^\$(.+)2(\d+) ${md[1]}_${md[2]}
     ]
 
     d = create_driver config_multiple_rules
-    assert_equal '^\$(.+) x$${md[1]}', d.instance.config['rename_rule1']
-    assert_equal '^(level)(\d+) ${md[1]}_${md[2]}', d.instance.config['rename_rule2']
+    assert_equal '^\$(.+)1 x$${md[1]}', d.instance.config['rename_rule1']
+    assert_equal '^\$(.+)2(\d+) ${md[1]}_${md[2]}', d.instance.config['rename_rule2']
   end
 
   def test_emit_default_append_tag
@@ -137,5 +137,20 @@ class RenameKeyOutputTest < Test::Unit::TestCase
     emits = d.emits
     assert_equal 1, emits.length
     assert_equal ['key3 key2 key1'], emits[0][2].keys
+  end
+
+  def test_rename_with_multiple_rules
+    config_multiple_rules = %q[
+      rename_rule1 ^(\w+)\s1 ${md[1]}_1
+      rename_rule2 ^(\w+)\s2 ${md[1]}_2
+    ]
+
+    d = create_driver config_multiple_rules
+    d.run do
+      d.emit 'key 1' => 'value1', 'key 2' => 'value2'
+    end
+
+    emits = d.emits
+    assert_equal ['key_1', 'key_2'], emits[0][2].keys
   end
 end
