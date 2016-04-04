@@ -8,18 +8,12 @@ describe Fluent::RenameKeyOutput do
 
   CONFIG = %q[
     rename_rule1 ^\$(.+) x$${md[1]}
-    rename_rule2 ^l(eve)l(\d+) ${md[1]}_${md[2]}
+    rename_rule2 ^(level)(\d+) ${md[1]}_${md[2]}
   ]
-
-
+  
   CONFIG_REMOVE_TAG_PREFIX = %q[
     rename_rule1 ^\$(.+) ${md[1]} somthing
     remove_tag_prefix input
-  ]
-
-  CONFIG_APPEND_TAG = %q[
-    rename_rule1 ^\$(.+) ${md[1]} somthing
-    append_tag postfix
   ]
 
   def create_driver conf=CONFIG, tag='test'
@@ -33,11 +27,7 @@ describe Fluent::RenameKeyOutput do
       expect(d.emits[0][0]).not_to start_with 'input'
     end
 
-    it "appends additional tag" do
-      d = create_driver CONFIG_APPEND_TAG, 'input.test'
-      d.run { d.emit 'test' => 'data' }
-      expect(d.emits[0][0]).to eq 'input.test.postfix'
-    end
+
   end
 
   context "private methods" do
@@ -51,41 +41,6 @@ describe Fluent::RenameKeyOutput do
     end
 
     describe "#rename_key" do
-      it "replace key name which matches the key_regexp at all level" do
-        d = create_driver %q[
-          rename_rule1 ^\$(.+) x$${md[1]}
-        ]
-        d.run do
-          d.emit '$url' => 'www.google.com', 'level2' => {'id'=>'something', 'a'=>{'$1' => 'option1'}}
-        end
-        result = d.emits[0][2]
-        p result
-        expect(result).to have_key 'x$url'
-        expect(result['level2']['a']).to have_key 'x$1'
-      end
-
-      it "replace key name only at the first level when deep_rename is false" do
-        d = create_driver %q[
-          rename_rule1 ^\$(.+) x$${md[1]}
-          deep_rename false
-        ]
-        d.run do
-          d.emit '$url' => 'www.google.com', 'level2' => {'id'=>'something', 'a'=>{'$1' => 'option1'}}
-        end
-        result = d.emits[0][2]
-        expect(result).to have_key 'x$url'
-        expect(result['level2']['a']).to have_key '$1'
-      end
-
-      it "replace key of hashes in an array" do
-        d = create_driver 'rename_rule1 ^\$(.+)\s(\w+) x$${md[2]} ${md[1]}'
-        d.run do
-          d.emit 'array' => [{'$url jump' => 'www.google.com'}, {'$url run' => 'www.google.com'}], 'level2' => {'$1' => 'options1'}
-        end
-        result = d.emits[0][2]
-        expect(result['array'][0]).to have_key 'x$jump url'
-        expect(result['array'][1]).to have_key 'x$run url'
-      end
 
       it "replaces key name using match data" do
         d = create_driver 'rename_rule1 ^\$(.+)\s(\w+) x$${md[2]} ${md[1]}'
