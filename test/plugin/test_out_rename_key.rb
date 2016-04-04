@@ -41,6 +41,13 @@ class RenameKeyOutputTest < Test::Unit::TestCase
     assert_equal '^\$(.+)2(\d+) ${md[1]}_${md[2]}', d.instance.config['rename_rule2']
   end
 
+  def test_parse_rename_rule
+    parsed = Fluent::RenameKeyOutput.new.parse_rename_rule '(reg)(exp) ${md[1]} ${md[2]}'
+    assert_equal 2, parsed.length
+    assert_equal '(reg)(exp)', parsed[0]
+    assert_equal '${md[1]} ${md[2]}', parsed[1]
+  end
+
   def test_emit_default_append_tag
     append_tag = Fluent::RenameKeyOutput::DEFAULT_APPEND_TAG
     d = create_driver
