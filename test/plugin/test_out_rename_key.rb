@@ -13,13 +13,9 @@ class RenameKeyOutputTest < Test::Unit::TestCase
   end
 
   def test_config_error
-    assert_raise(Fluent::ConfigError) {
-      d = create_driver('')
-    }
+    assert_raise(Fluent::ConfigError) { create_driver('') }
 
-    assert_raise(Fluent::ConfigError) {
-      create_driver('rename_rule1 ^$(.+?) ')
-    }
+    assert_raise(Fluent::ConfigError) { create_driver('rename_rule1 ^$(.+?) ') }
 
     assert_raise(Fluent::ConfigError) {
       config_dup_rules_for_a_key = %q[
