@@ -108,4 +108,24 @@ class RenameKeyOutputTest < Test::Unit::TestCase
     emits = d.emits
     assert_equal ['$key3', '$key4'], emits[0][2]['%key2'].keys
   end
+
+  def test_remove_tag_prefix
+    append_tag = Fluent::RenameKeyOutput::DEFAULT_APPEND_TAG
+
+    config = %Q[
+      #{CONFIG}
+      remove_tag_prefix #{MATCH_TAG}
+    ]
+
+    d = create_driver config
+    d.run do
+      d.emit 'key1' => 'value1'
+      d.emit '$key2' => 'value2'
+    end
+
+    emits = d.emits
+    assert_equal 2, emits.length
+    assert_equal append_tag, emits[0][0]
+    assert_equal append_tag, emits[1][0]
+  end
 end

@@ -10,24 +10,9 @@ describe Fluent::RenameKeyOutput do
     rename_rule1 ^\$(.+) x$${md[1]}
     rename_rule2 ^(level)(\d+) ${md[1]}_${md[2]}
   ]
-  
-  CONFIG_REMOVE_TAG_PREFIX = %q[
-    rename_rule1 ^\$(.+) ${md[1]} somthing
-    remove_tag_prefix input
-  ]
 
   def create_driver conf=CONFIG, tag='test'
     Fluent::Test::OutputTestDriver.new(Fluent::RenameKeyOutput, tag).configure(conf)
-  end
-
-  context "emits" do
-    it "removes tag prefix" do
-      d = create_driver CONFIG_REMOVE_TAG_PREFIX, 'input.test'
-      d.run { d.emit 'test' => 'data' }
-      expect(d.emits[0][0]).not_to start_with 'input'
-    end
-
-
   end
 
   context "private methods" do
