@@ -7,6 +7,10 @@ class Fluent::RenameKeyOutput < Fluent::Output
   config_param :append_tag, :string, default: DEFAULT_APPEND_TAG
   config_param :deep_rename, :bool, default: true
 
+  unless method_defined?(:router)
+    define_method("router") { Fluent::Engine }
+  end
+
   def configure conf
     super
 
@@ -37,7 +41,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
       new_tag = @remove_tag_prefix ? tag.sub(@remove_tag_prefix, '') : tag
       new_tag = "#{new_tag}.#{@append_tag}".sub(/^\./, '')
       new_record = rename_key record
-      Fluent::Engine.emit new_tag, time, new_record
+      router.emit new_tag, time, new_record
     end
 
     chain.next
