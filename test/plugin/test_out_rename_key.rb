@@ -128,4 +128,14 @@ class RenameKeyOutputTest < Test::Unit::TestCase
     assert_equal append_tag, emits[0][0]
     assert_equal append_tag, emits[1][0]
   end
+
+  def test_rename_with_match_data
+    d = create_driver 'rename_rule1 (\w+)\s(\w+)\s(\w+) ${md[3]} ${md[2]} ${md[1]}'
+    d.run do
+      d.emit 'key1 key2 key3' => 'value'
+    end
+    emits = d.emits
+    assert_equal 1, emits.length
+    assert_equal ['key3 key2 key1'], emits[0][2].keys
+  end
 end
