@@ -1,8 +1,10 @@
 class Fluent::RenameKeyOutput < Fluent::Output
   Fluent::Plugin.register_output 'rename_key', self
 
+  DEFAULT_APPEND_TAG = 'key_renamed'
+
   config_param :remove_tag_prefix, :string, default: nil
-  config_param :append_tag, :string, default: 'key_renamed'
+  config_param :append_tag, :string, default: DEFAULT_APPEND_TAG
   config_param :deep_rename, :bool, default: true
 
   def configure conf

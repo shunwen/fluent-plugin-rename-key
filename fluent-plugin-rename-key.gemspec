@@ -4,7 +4,7 @@ $:.push File.expand_path('../lib', __FILE__)
 Gem::Specification.new do |gem|
   gem.name        = "fluent-plugin-rename-key"
   gem.version     = "0.1.4"
-  gem.license     = "Apache 2.0"
+  gem.license     = "Apache-2.0"
   gem.authors     = ["Shunwen Hsiao"]
   gem.email       = "hsiaoshunwen@gmail.com"
   gem.homepage    = "https://github.com/shunwen/fluent-plugin-rename-key"
@@ -16,10 +16,8 @@ Gem::Specification.new do |gem|
   gem.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.require_paths = ['lib']
 
-  gem.add_dependency "fluentd", "~> 0.10.9"
-  gem.add_development_dependency "rspec"
-  gem.add_development_dependency "bundler"
+  gem.add_runtime_dependency "fluentd"
+  gem.add_development_dependency "test-unit", ">= 3.1.0"
   gem.add_development_dependency "rake"
   gem.add_development_dependency 'coveralls'
-
 end
