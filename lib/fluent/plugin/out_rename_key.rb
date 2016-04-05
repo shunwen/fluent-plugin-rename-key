@@ -1,15 +1,32 @@
 class Fluent::RenameKeyOutput < Fluent::Output
   Fluent::Plugin.register_output 'rename_key', self
 
-  DEFAULT_APPEND_TAG = 'key_renamed'
-
-  config_param :remove_tag_prefix, :string, default: nil
-  config_param :append_tag, :string, default: DEFAULT_APPEND_TAG
-  config_param :deep_rename, :bool, default: true
-
+  # To support Fluentd v0.10.57 or earlier
   unless method_defined?(:router)
     define_method("router") { Fluent::Engine }
   end
+
+  # Define `log` method for v0.10.42 or earlier
+  unless method_defined?(:log)
+    define_method("log") { $log }
+  end
+
+  # For fluentd v0.12.16 or earlier
+  class << self
+    unless method_defined?(:desc)
+      def desc(description)
+      end
+    end
+  end
+
+  DEFAULT_APPEND_TAG = 'key_renamed'
+
+  desc 'Specify and remove tag prefix.'
+  config_param :remove_tag_prefix, :string, default: nil
+  desc "Append custom tag postfix (default: #{DEFAULT_APPEND_TAG})."
+  config_param :append_tag, :string, default: DEFAULT_APPEND_TAG
+  desc 'Deep rename/replace operation.'
+  config_param :deep_rename, :bool, default: true
 
   def configure conf
     super
@@ -28,7 +45,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
       end
 
       @rename_rules << { key_regexp: /#{key_regexp}/, new_key: new_key }
-      $log.info "Added rename key rule: #{r} #{@rename_rules.last}"
+      log.info "Added rename key rule: #{r} #{@rename_rules.last}"
     end
 
     @replace_rules = []
@@ -49,7 +66,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
       end
 
       @replace_rules << { key_regexp: /#{key_regexp}/, replacement: replacement }
-      $log.info "Added replace key rule: #{r} #{@replace_rules.last}"
+      log.info "Added replace key rule: #{r} #{@replace_rules.last}"
     end
 
     raise Fluent::ConfigError, "No rename or replace rules are given" if @rename_rules.empty? && @replace_rules.empty?
@@ -72,15 +89,11 @@ class Fluent::RenameKeyOutput < Fluent::Output
   # private
 
   def parse_rename_rule rule
-    if rule.match /^([^\s]+)\s+(.+)$/
-      $~.captures
-    end
+    $~.captures if rule.match /^([^\s]+)\s+(.+)$/
   end
 
   def parse_replace_rule rule
-    if rule.match /^([^\s]+)(?:\s+(.+))?$/
-      $~.captures
-    end
+    $~.captures if rule.match /^([^\s]+)(?:\s+(.+))?$/
   end
 
   def rename_key record
@@ -93,7 +106,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
         next unless match_data # next rule
 
         placeholder = get_placeholder match_data
-        key = rule[:new_key].gsub /\${\w+\[\d+\]?}/, placeholder
+        key = rule[:new_key].gsub /\${md\[\d+\]}/, placeholder
         break
       end
 
@@ -121,7 +134,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
         next unless match_data # next rule
 
         placeholder = get_placeholder match_data
-        key = key.gsub rule[:key_regexp], rule[:replacement].gsub(/\${\w+\[\d+\]?}/, placeholder)
+        key = key.gsub rule[:key_regexp], rule[:replacement].gsub(/\${md\[\d+\]}/, placeholder)
         break
       end
 
@@ -143,7 +156,7 @@ class Fluent::RenameKeyOutput < Fluent::Output
     placeholder = {}
 
     match_data.to_a.each_with_index do |e, idx|
-      placeholder.store "${md[#{idx}]}", e
+      placeholder["${md[#{idx}]}"] = e
     end
 
     placeholder
