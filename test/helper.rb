@@ -23,6 +23,9 @@ unless ENV.has_key?('VERBOSE')
 end
 
 require 'fluent/plugin/out_rename_key'
+if defined?(Fluent::Filter)
+  require 'fluent/plugin/filter_rename_key'
+end
 
 class Test::Unit::TestCase
 end
