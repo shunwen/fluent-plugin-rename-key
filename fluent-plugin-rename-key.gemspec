@@ -3,7 +3,7 @@ $:.push File.expand_path('../lib', __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = 'fluent-plugin-rename-key'
-  s.version     = '0.3.1'
+  s.version     = '0.3.2'
   s.date        = '2016-11-29'
   s.license     = 'Apache-2.0'
   s.authors     = ['Shunwen Hsiao', 'Julian Grinblat', 'Hiroshi Hatake']
@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_runtime_dependency 'fluentd', '~> 0.14'
-  s.add_development_dependency 'test-unit', '~> 3.2.0'
-  s.add_development_dependency 'rake', '~> 11.3.0'
-  s.add_development_dependency 'coveralls', '~> 0.8.13'
+  s.add_development_dependency 'test-unit', '~> 3.2'
+  s.add_development_dependency 'rake', '~> 11.3'
+  s.add_development_dependency 'coveralls', '~> 0.8'
 end
