@@ -3,7 +3,6 @@ language: ruby
 rvm:
   - 2.3.0
   - 2.2
-  - 1.9.3
 
 # to avoid travis-ci issue since 2015-12-25
 before_install:
