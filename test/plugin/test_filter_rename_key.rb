@@ -55,7 +55,7 @@ class RenameKeyFilterTest < Test::Unit::TestCase
   end
 
   def test_parse_replace_rule_without_replacement
-    # Remove all parethesis hyphens and spaces
+    # Remove all parenthesis hyphens and spaces
     parsed = Fluent::RenameKeyOutput.new.parse_replace_rule '[()-\s]'
     assert_equal 2, parsed.length
     assert_equal '[()-\s]', parsed[0]

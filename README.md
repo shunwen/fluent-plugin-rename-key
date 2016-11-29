@@ -28,6 +28,11 @@ $ sudo /usr/lib64/fluent/ruby/bin/fluent-gem install fluent-plugin-rename-key
 
 ## Configuration
 
+### Notice
+
+v0.12's filter plugin does not have a functionality to modify tag and time. If you want to modify time in filter plugin, we recommends to migrate to depends on v0.14 Filter Plugin API.
+v0.14's filter API has `#filter_with_time` method.
+
 ### Syntax
 
 ```
