@@ -3,7 +3,7 @@ $:.push File.expand_path('../lib', __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = 'fluent-plugin-rename-key'
-  s.version     = '0.3.3'
+  s.version     = '0.3.4'
   s.date        = '2016-11-29'
   s.license     = 'Apache-2.0'
   s.authors     = ['Shunwen Hsiao', 'Julian Grinblat', 'Hiroshi Hatake']
@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/shunwen/fluent-plugin-rename-key'
   s.summary     = %q[Fluentd output plugin. Rename keys which match given regular expressions, assign new tags and re-emit the records.]
 
-  s.required_ruby_version = '>= 2.2'
+  s.required_ruby_version = '>= 1.9.3'
   s.files       = `git ls-files`.split("\n")
   s.test_files  = `git ls-files -- {test}/*`.split("\n")
   s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
