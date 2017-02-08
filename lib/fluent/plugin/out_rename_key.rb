@@ -4,6 +4,8 @@ require 'fluent/plugin/rename_key_util'
 class Fluent::Plugin::RenameKeyOutput < Fluent::Plugin::Output
   Fluent::Plugin.register_output 'rename_key', self
 
+  helpers :event_emitter
+
   include Fluent::Plugin::RenameKeyUtil
 
   DEFAULT_APPEND_TAG = 'key_renamed'
