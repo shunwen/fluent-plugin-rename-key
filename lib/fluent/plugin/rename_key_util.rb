@@ -1,4 +1,4 @@
-module Fluent
+module Fluent::Plugin
   module RenameKeyUtil
     def create_rename_rules(conf)
       @rename_rules = []
