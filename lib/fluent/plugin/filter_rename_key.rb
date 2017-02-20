@@ -1,9 +1,10 @@
+require 'fluent/plugin/filter'
 require 'fluent/plugin/rename_key_util'
 
-class Fluent::RenameKeyFilter < Fluent::Filter
+class Fluent::Plugin::RenameKeyFilter < Fluent::Plugin::Filter
   Fluent::Plugin.register_filter 'rename_key', self
 
-  include Fluent::RenameKeyUtil
+  include Fluent::Plugin::RenameKeyUtil
 
   desc 'Deep rename/replace operation.'
   config_param :deep_rename, :bool, default: true
@@ -22,4 +23,4 @@ class Fluent::RenameKeyFilter < Fluent::Filter
     new_record = replace_key new_record
     new_record
   end
-end if defined?(Fluent::Filter)
+end
