@@ -43,8 +43,8 @@ class RenameKeyOutputTest < Test::Unit::TestCase
   def test_parse_rename_rule
     parsed = Fluent::Plugin::RenameKeyOutput.new.parse_rename_rule '(reg)(exp) ${md[1]} ${md[2]}'
     assert_equal 2, parsed.length
-    assert_equal '(reg)(exp)', parsed[0]
-    assert_equal '${md[1]} ${md[2]}', parsed[1]
+    assert_equal '(reg)(exp)', parsed['key_regexp']
+    assert_equal '${md[1]} ${md[2]}', parsed['new_key']
   end
 
   def test_parse_replace_rule_with_replacement

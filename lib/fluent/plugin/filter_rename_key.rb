@@ -15,12 +15,12 @@ class Fluent::Plugin::RenameKeyFilter < Fluent::Plugin::Filter
     create_rename_rules(conf)
     create_replace_rules(conf)
 
-    raise Fluent::ConfigError, "No rename or replace rules are given" if @rename_rules.empty? && @replace_rules.empty?
+    if @rename_rules.empty? && @replace_rules.empty?
+      raise Fluent::ConfigError, 'No rename nor replace rule given'
+    end
   end
 
-  def filter tag, time, record
-    new_record = rename_key record
-    new_record = replace_key new_record
-    new_record
+  def filter _tag, _time, record
+    replace_key(rename_key(record))
   end
 end
