@@ -1,53 +1,40 @@
 module Fluent::Plugin
   module RenameKeyUtil
+    CONF_RENAME = 'rename_rule'
+    CONF_REPLACE = 'replace_rule'
+
     def create_rename_rules(conf)
       @rename_rules = []
-      conf_rename_rules = conf.keys.select { |k| k =~ /^rename_rule(\d+)$/ }
-      conf_rename_rules.sort_by { |r| r.sub('rename_rule', '').to_i }.each do |r|
-        key_regexp, new_key = parse_rename_rule conf[r]
+      rule_keys = conf.keys.select { |k| k.strip.start_with? CONF_RENAME }.
+          sort_by { |k| k.sub(CONF_RENAME, '').to_i }
 
-        if key_regexp.nil? || new_key.nil?
-          raise Fluent::ConfigError, "Failed to parse: #{r} #{conf[r]}"
+      rule_keys.each do |rule_key|
+        rule = parse_rename_rule conf[rule_key]
+
+        if @rename_rules.any? { |existing_rule| existing_rule[:key_regexp] == rule[:key_regexp] }
+          raise Fluent::ConfigError, "Duplicated rules for key #{rule[:key_regexp].source}: #{@rename_rules}"
         end
 
-        if @rename_rules.map { |r| r[:key_regexp] }.include? /#{key_regexp}/
-          raise Fluent::ConfigError, "Duplicated rules for key #{key_regexp}: #{@rename_rules}"
-        end
-
-        @rename_rules << { key_regexp: /#{key_regexp}/, new_key: new_key }
-        log.info "Added rename key rule: #{r} #{@rename_rules.last}"
+        @rename_rules << rule
+        log.info "Added rename key rule: #{rule_key} #{@rename_rules.last}"
       end
     end
 
     def create_replace_rules(conf)
       @replace_rules = []
-      conf_replace_rules = conf.keys.select { |k| k =~ /^replace_rule(\d+)$/ }
-      conf_replace_rules.sort_by { |r| r.sub('replace_rule', '').to_i }.each do |r|
-        key_regexp, replacement = parse_replace_rule conf[r]
+      rule_keys = conf.keys.select { |k| k.strip.start_with? CONF_REPLACE }.
+          sort_by { |k| k.sub(CONF_REPLACE, '').to_i }
 
-        if key_regexp.nil?
-          raise Fluent::ConfigError, "Failed to parse: #{r} #{conf[r]}"
+      rule_keys.each do |rule_key|
+        rule = parse_replace_rule conf[rule_key]
+
+        if @replace_rules.any? { |existing_rule| existing_rule[:key_regexp] == rule[:key_regexp] }
+          raise Fluent::ConfigError, "Duplicated rules for key #{rule[:key_regexp].source}: #{@replace_rules}"
         end
 
-        if replacement.nil?
-          replacement = ""
-        end
-
-        if @replace_rules.map { |r| r[:key_regexp] }.include? /#{key_regexp}/
-          raise Fluent::ConfigError, "Duplicated rules for key #{key_regexp}: #{@replace_rules}"
-        end
-
-        @replace_rules << { key_regexp: /#{key_regexp}/, replacement: replacement }
-        log.info "Added replace key rule: #{r} #{@replace_rules.last}"
+        @replace_rules << rule
+        log.info "Added replace key rule: #{rule_key} #{@replace_rules.last}"
       end
-    end
-
-    def parse_rename_rule rule
-      $~.captures if rule.match /^([^\s]+)\s+(.+)$/
-    end
-
-    def parse_replace_rule rule
-      $~.captures if rule.match /^([^\s]+)(?:\s+(.+))?$/
     end
 
     def rename_key record
@@ -104,6 +91,22 @@ module Fluent::Plugin
       end
 
       new_record
+    end
+
+    private
+
+    def parse_rename_rule rule
+      m = rule.match(/^([^\s]+)\s+(.+)$/).captures
+      { key_regexp: /#{m[0]}/, new_key: m[1] }
+    rescue => e
+      raise Fluent::ConfigError, "Failed to parse rename rule #{rule} : #{e.message}"
+    end
+
+    def parse_replace_rule rule
+      m = rule.match(/^([^\s]+)(?:\s+(.+))?$/).captures
+      { key_regexp: /#{m[0]}/, replacement: m[1] || '' }
+    rescue => e
+      raise Fluent::ConfigError, "Failed to parse replace rule #{rule} : #{e.message}"
     end
 
     def get_placeholder match_data

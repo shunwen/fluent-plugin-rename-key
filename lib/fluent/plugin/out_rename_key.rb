@@ -23,7 +23,7 @@ class Fluent::Plugin::RenameKeyOutput < Fluent::Plugin::Output
     create_rename_rules(conf)
     create_replace_rules(conf)
 
-    raise Fluent::ConfigError, "No rename or replace rules are given" if @rename_rules.empty? && @replace_rules.empty?
+    raise Fluent::ConfigError, 'No rename nor replace rules are given' if @rename_rules.empty? && @replace_rules.empty?
 
     @remove_tag_prefix = /^#{Regexp.escape @remove_tag_prefix}\.?/ if @remove_tag_prefix
   end

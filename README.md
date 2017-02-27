@@ -7,57 +7,58 @@
 
 ## Overview
 
-Fluentd filter / output plugin. Renames keys matching the given regular expressions, assign new tags, and re-emits. This plugin resembles the implementation of [fluent-plugin-rewrite-tag-filter](https://github.com/y-ken/fluent-plugin-rewrite-tag-filter).
+This manual is for `~> 0.4.0`, which uses fluentd v0.14 API. For earlier version please see [here](https://github.com/shunwen/fluent-plugin-rename-key/tree/fluentd-v0.12).
 
-This plugin is created to resolve the invalid record problem while converting to BSON document before inserting to MongoDB, see [Restrictions on Field Names](http://docs.mongodb.org/manual/reference/limits/#Restrictions on Field Names) and [MongoDB Document Types](http://docs.mongodb.org/meta-driver/latest/legacy/bson/#mongodb-document-types) for more information.
+This plugin renames or replace portion of keys by regular expressions, assign new tags, and re-emits. 
+
+It was created to work around the [field name restrictions](http://docs.mongodb.org/manual/reference/limits/#Restrictions on Field Names) of MongoDB BSON document. Also see [MongoDB Document Types](http://docs.mongodb.org/meta-driver/latest/legacy/bson/#mongodb-document-types) for more information.
+
+## Requirements
+
+For Fluentd earlier than v0.14.0, please use the earlier version 0.3.4. 
+
+| fluent-plugin-rename-key  | Fluentd    | ruby   |
+|---------------------------|------------|--------|
+| ~> 0.3.4                  | >= v0.12.0 | >= 1.9 |
+| ~> 0.4.0                  | >= v0.14.0 | >= 2.1 |
 
 ## Installation
 
-Install with gem or fluent-gem command as:
-
-```
-# for fluentd
-$ gem install fluent-plugin-rename-key
-
-# for td-agent OSX (Homebrew)
-$ /usr/local/Cellar/td-agent/1.1.17/bin/fluent-gem install fluent-plugin-rename-key
-
-# for td-agent 2
-$ sudo /usr/sbin/td-agent-gem install fluent-plugin-rename-key
-```
+See [Fluentd Installation Guide] (http://docs.fluentd.org/v0.12/categories/installation)
 
 ## Configuration
 
 ### Syntax
 
 ```
-# <num> is an integer, used to sort and apply the rules
-# <key_regexp> is the regular expression used to match the keys, whitespace is not allowed, use "\s" instead
-# <new_key> is the string with MatchData placeholder for creating the new key name, whitespace is allowed
+# <num> is an integer for ordering rules, rules are checked in ascending order. Only the first match is applied.
+# <key_regexp> is the regular expression to match keys, ' '(whitespace) is not allowed, use '\s' instead.
+# <new_key> is the new key name pattern, MatchData placeholder '${md[1]}' and whitespace are allowed.
 rename_rule<num> <key_regexp> <new_key>
 
-# <num> is an integer, used to sort and apply the rules
-# <key_regexp> is the regular expression used to match the keys, whitespace is not allowed, use "\s" instead
-# <new_key> is the string to replace the matches with, with MatchData placeholder for creating the new key name, whitespace is allowed. Optional, if missing then the matches are removed
+# <num> is an integer for ordering rules, rules are checked in ascending order. Only the first match is applied.
+# <key_regexp> is the regular expression to match keys, ' '(whitespace) is not allowed, use '\s' instead.
+# <new_key> is the pattern to replace the matches with, MatchData placeholder '${md[1]}' and whitespace are allowed. 
+#           This field is optional, if missing the matches will be replaced with ''(empty string).
 replace_rule<num> <key_regexp> <new_key>
 
-# Optional: dig into the hash structure and rename every matched key, or rename only keys at the first level,
+# Optional: dig into the hash structure and rename every matched key, or stop at the first level,
 # default is "true"
 deep_rename <bool>
 
 # Optional: remove tag prefix. This is only for <match>
 remove_tag_prefix <string>
 
-# Optional: append additional name to the original tag, default is "key_renamed". This is only for <match>
+# Optional: append additional name to the original tag, default is 'key_renamed'. This is only for <match>
 append_tag <string>
 ```
 
 ### Example
 
 Take this record as example: `'$url' => 'www.google.com', 'level2' => {'$1' => 'option1'}`.
-To successfully save it into MongoDB, we can use the following config to replace the keys starting with dollar sign.
+To save it to MongoDB, we can use the following config to replace the keys starting with dollar sign.
 
-For fluentd v0.12 or later, use `rename_key` filter:
+For Fluentd v0.14 or later, use `rename_key` filter:
 
 ```
 # At rename_rule1, it matches the key starting the '$', say '$url',
@@ -71,34 +72,18 @@ For fluentd v0.12 or later, use `rename_key` filter:
 </match>
 ```
 
-The resulting record is `'x$url' => 'www.google.com', 'eve_2' => {'x$1' => 'option1'}`.
-For fluentd v0.10, you need to use output version instead of filter:
-
-```
-<match input.test>
-  @type rename_key
-  remove_tag_prefix input.test
-  append_tag renamed
-  rename_rule1 ^\$(.+) x$${md[1]}
-  rename_rule2 ^l(.{3})l(\d+) ${md[1]}_${md[2]}
-</match>
-```
-
-The resulting record is `'x$url' => 'www.google.com', 'eve_2' => {'x$1' => 'option1'}` with new tag `renamed`.
+The result is `'x$url' => 'www.google.com', 'eve_2' => {'x$1' => 'option1'}`.
 
 ### MatchData placeholder
 
-This plugin uses Ruby's `String#match` to match the key to be replaced, and it is possible to refer to the contents of the resulting `MatchData` to create the new key name. `${md[0]}` refers to the matched string and `${md[1]}` refers to match group 1, and so on.
+This plugin uses `String#match` to match keys to be replaced. It is possible to reference the resulting `MatchData` in new key names. For example, `${md[0]}` is the matched string, `${md[1]}` is match group 1, and so on. 
 
-**Note:** Range expression `${md[0..2]}` is not supported.
+**Note:** This is done by matching `${md[0]}` string pattern, so array operations such as range `${md[0..2]}` is not supported.
 
-## TODO
-
-v0.12's filter plugin does not have a functionality to modify tag and time. If you want to modify time in filter plugin, we recommends to migrate to depends on v0.14 Filter Plugin API.
-v0.14's filter API has `#filter_with_time` method.
+## Inspired by
+This plugin initially resembled the implementation of [fluent-plugin-rewrite-tag-filter](https://github.com/y-ken/fluent-plugin-rewrite-tag-filter).
 
 ## Copyright
 
 Copyright :  Copyright (c) 2013- Shunwen Hsiao (@hswtw)
 License   :  Apache License, Version 2.0
-
