@@ -40,18 +40,6 @@ module Fluent::Plugin
       end
     end
 
-    def parse_rename_rule rule
-      rule.match(/^(?<key_regexp>[^\s]+)\s+(?<new_key>.+)$/).named_captures
-    rescue
-      raise Fluent::ConfigError, "Failed to parse rename rule: #{rule}"
-    end
-
-    def parse_replace_rule rule
-      rule.match(/^([^\s]+)(?:\s+(.+))?$/).captures
-    rescue
-      raise Fluent::ConfigError, "Failed to parse: #{rule}"
-    end
-
     def rename_key record
       new_record = {}
 
@@ -106,6 +94,19 @@ module Fluent::Plugin
       end
 
       new_record
+    end
+
+    def parse_rename_rule rule
+      rule.match(/^(?<key_regexp>[^\s]+)\s+(?<new_key>.+)$/).named_captures
+    rescue
+      raise Fluent::ConfigError, "Failed to parse rename rule: #{rule}"
+    end
+
+    def parse_replace_rule rule
+      rule.match(/^([^\s]+)(?:\s+(.+))?$/).captures
+      # rule.match(/^(?<key_regexp>[^\s]+)\s*(?<new_key>.+)?$/).named_captures
+    rescue
+      raise Fluent::ConfigError, "Failed to parse: #{rule}"
     end
 
     def get_placeholder match_data
