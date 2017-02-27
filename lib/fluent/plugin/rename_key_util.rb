@@ -1,6 +1,8 @@
 module Fluent::Plugin
   module RenameKeyUtil
     CONF_RENAME = 'rename_rule'
+    CONF_REPLACE = 'replace_rule'
+
     def create_rename_rules(conf)
       @rename_rules = []
       rule_keys = conf.keys.select { |k| k.strip.start_with? CONF_RENAME }.
@@ -21,24 +23,20 @@ module Fluent::Plugin
 
     def create_replace_rules(conf)
       @replace_rules = []
-      conf_replace_rules = conf.keys.select { |k| k =~ /^replace_rule(\d+)$/ }
-      conf_replace_rules.sort_by { |r| r.sub('replace_rule', '').to_i }.each do |r|
-        key_regexp, replacement = parse_replace_rule conf[r]
+      rule_keys = conf.keys.select { |k| k.strip.start_with? CONF_REPLACE }.
+          sort_by { |k| k.sub(CONF_REPLACE, '').to_i }
 
-        if key_regexp.nil?
-          raise Fluent::ConfigError, "Failed to parse: #{r} #{conf[r]}"
+      rule_keys.each do |rule_key|
+        rule = parse_replace_rule conf[rule_key]
+        key_regexp = /#{rule[0]}/
+        replacement = rule[1] || ''
+
+        if @replace_rules.any? { |r| r[:key_regexp] == key_regexp }
+          raise Fluent::ConfigError, "Duplicated rules for key #{key_regexp.source}: #{@replace_rules}"
         end
 
-        if replacement.nil?
-          replacement = ""
-        end
-
-        if @replace_rules.map { |r| r[:key_regexp] }.include? /#{key_regexp}/
-          raise Fluent::ConfigError, "Duplicated rules for key #{key_regexp}: #{@replace_rules}"
-        end
-
-        @replace_rules << { key_regexp: /#{key_regexp}/, replacement: replacement }
-        log.info "Added replace key rule: #{r} #{@replace_rules.last}"
+        @replace_rules << { key_regexp: key_regexp, replacement: replacement }
+        log.info "Added replace key rule: #{rule_key} #{@replace_rules.last}"
       end
     end
 
@@ -49,7 +47,9 @@ module Fluent::Plugin
     end
 
     def parse_replace_rule rule
-      $~.captures if rule.match /^([^\s]+)(?:\s+(.+))?$/
+      rule.match(/^([^\s]+)(?:\s+(.+))?$/).captures
+    rescue
+      raise Fluent::ConfigError, "Failed to parse: #{rule}"
     end
 
     def rename_key record
