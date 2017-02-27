@@ -10,13 +10,13 @@ module Fluent::Plugin
 
       rule_keys.each do |rule_key|
         rule = parse_rename_rule conf[rule_key]
-        key_regexp, new_key = /#{rule['key_regexp']}/, rule['new_key']
+        key_regexp = rule[:key_regexp]
 
-        if @rename_rules.any? { |r| r[:key_regexp] == key_regexp }
+        if @rename_rules.any? { |existing_rule| existing_rule[:key_regexp] == rule[:key_regexp] }
           raise Fluent::ConfigError, "Duplicated rules for key #{key_regexp.source}: #{@rename_rules}"
         end
 
-        @rename_rules << { key_regexp: key_regexp, new_key: new_key }
+        @rename_rules << rule
         log.info "Added rename key rule: #{rule_key} #{@rename_rules.last}"
       end
     end
@@ -31,11 +31,11 @@ module Fluent::Plugin
         key_regexp = /#{rule[0]}/
         replacement = rule[1] || ''
 
-        if @replace_rules.any? { |r| r[:key_regexp] == key_regexp }
+        if @replace_rules.any? { |existing_rule| existing_rule[:key_regexp] == rule[:key_regexp] }
           raise Fluent::ConfigError, "Duplicated rules for key #{key_regexp.source}: #{@replace_rules}"
         end
 
-        @replace_rules << { key_regexp: key_regexp, replacement: replacement }
+        @replace_rules << rule
         log.info "Added replace key rule: #{rule_key} #{@replace_rules.last}"
       end
     end
@@ -96,17 +96,20 @@ module Fluent::Plugin
       new_record
     end
 
+    private
+
     def parse_rename_rule rule
-      rule.match(/^(?<key_regexp>[^\s]+)\s+(?<new_key>.+)$/).named_captures
-    rescue
-      raise Fluent::ConfigError, "Failed to parse rename rule: #{rule}"
+      m = rule.match(/^([^\s]+)\s+(.+)$/).captures
+      { key_regexp: /#{m[0]}/, new_key: m[1] }
+    rescue => e
+      raise Fluent::ConfigError, "Failed to parse rename rule #{rule} : #{e.message}"
     end
 
     def parse_replace_rule rule
-      rule.match(/^([^\s]+)(?:\s+(.+))?$/).captures
-      # rule.match(/^(?<key_regexp>[^\s]+)\s*(?<new_key>.+)?$/).named_captures
-    rescue
-      raise Fluent::ConfigError, "Failed to parse: #{rule}"
+      m = rule.match(/^([^\s]+)(?:\s+(.+))?$/).captures
+      { key_regexp: /#{m[0]}/, replacement: m[1] || '' }
+    rescue => e
+      raise Fluent::ConfigError, "Failed to parse replace rule #{rule} : #{e.message}"
     end
 
     def get_placeholder match_data

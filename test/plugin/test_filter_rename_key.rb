@@ -40,28 +40,6 @@ class RenameKeyFilterTest < Test::Unit::TestCase
     assert_equal '^\$(.+)2(\d+) ${md[1]}_${md[2]}', d.instance.config['rename_rule2']
   end
 
-  def test_parse_rename_rule
-    parsed = Fluent::Plugin::RenameKeyFilter.new.parse_rename_rule '(reg)(exp) ${md[1]} ${md[2]}'
-    assert_equal 2, parsed.length
-    assert_equal '(reg)(exp)', parsed['key_regexp']
-    assert_equal '${md[1]} ${md[2]}', parsed['new_key']
-  end
-
-  def test_parse_replace_rule_with_replacement
-    # Replace hyphens with underscores
-    parsed = Fluent::Plugin::RenameKeyFilter.new.parse_replace_rule '- _'
-    assert_equal 2, parsed.length
-    assert_equal '-', parsed[0]
-    assert_equal '_', parsed[1]
-  end
-
-  def test_parse_replace_rule_without_replacement
-    # Remove all parenthesis hyphens and spaces
-    parsed = Fluent::Plugin::RenameKeyFilter.new.parse_replace_rule '[()-\s]'
-    assert_equal 2, parsed.length
-    assert_equal '[()-\s]', parsed[0]
-    assert parsed[1].nil?
-  end
 
   def test_rename_rule_emit_deep_rename_hash
     d = create_driver RENAME_RULE_CONFIG
