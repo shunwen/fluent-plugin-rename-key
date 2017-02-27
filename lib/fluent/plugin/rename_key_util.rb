@@ -10,10 +10,9 @@ module Fluent::Plugin
 
       rule_keys.each do |rule_key|
         rule = parse_rename_rule conf[rule_key]
-        key_regexp = rule[:key_regexp]
 
         if @rename_rules.any? { |existing_rule| existing_rule[:key_regexp] == rule[:key_regexp] }
-          raise Fluent::ConfigError, "Duplicated rules for key #{key_regexp.source}: #{@rename_rules}"
+          raise Fluent::ConfigError, "Duplicated rules for key #{rule[:key_regexp].source}: #{@rename_rules}"
         end
 
         @rename_rules << rule
@@ -28,11 +27,9 @@ module Fluent::Plugin
 
       rule_keys.each do |rule_key|
         rule = parse_replace_rule conf[rule_key]
-        key_regexp = /#{rule[0]}/
-        replacement = rule[1] || ''
 
         if @replace_rules.any? { |existing_rule| existing_rule[:key_regexp] == rule[:key_regexp] }
-          raise Fluent::ConfigError, "Duplicated rules for key #{key_regexp.source}: #{@replace_rules}"
+          raise Fluent::ConfigError, "Duplicated rules for key #{rule[:key_regexp].source}: #{@replace_rules}"
         end
 
         @replace_rules << rule
