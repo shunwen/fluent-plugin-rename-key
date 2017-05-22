@@ -28,6 +28,10 @@ class Fluent::Plugin::RenameKeyOutput < Fluent::Plugin::Output
     @remove_tag_prefix = /^#{Regexp.escape @remove_tag_prefix}\.?/ if @remove_tag_prefix
   end
 
+  def multi_workers_ready?
+    true
+  end
+
   def process tag, es
     es.each do |time, record|
       new_tag = @remove_tag_prefix ? tag.sub(@remove_tag_prefix, '') : tag
