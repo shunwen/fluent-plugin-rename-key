@@ -11,7 +11,7 @@ This manual is for `~> 0.4.0`, which uses fluentd v0.14 API. For earlier version
 
 This plugin renames or replace portion of keys by regular expressions, assign new tags, and re-emits. 
 
-It was created to work around the [field name restrictions](http://docs.mongodb.org/manual/reference/limits/#Restrictions on Field Names) of MongoDB BSON document. Also see [MongoDB Document Types](http://docs.mongodb.org/meta-driver/latest/legacy/bson/#mongodb-document-types) for more information.
+It was created to work around the [field name restrictions](https://docs.mongodb.com/manual/reference/limits/#Restrictions-on-Field-Names) of MongoDB BSON document. Also see [MongoDB Document Types](http://docs.mongodb.org/meta-driver/latest/legacy/bson/#mongodb-document-types) for more information.
 
 ## Requirements
 
@@ -24,7 +24,7 @@ For Fluentd earlier than v0.14.0, please use the earlier version 0.3.4.
 
 ## Installation
 
-See [Fluentd Installation Guide] (http://docs.fluentd.org/v0.12/categories/installation)
+See [Fluentd Installation Guide](http://docs.fluentd.org/v0.12/categories/installation)
 
 ## Configuration
 
