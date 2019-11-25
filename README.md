@@ -69,7 +69,7 @@ For Fluentd v0.14 or later, use `rename_key` filter:
   @type rename_key
   rename_rule1 ^\$(.+) x$${md[1]}
   rename_rule2 ^l(.{3})l(\d+) ${md[1]}_${md[2]}
-</match>
+</filter>
 ```
 
 The result is `'x$url' => 'www.google.com', 'eve_2' => {'x$1' => 'option1'}`.
